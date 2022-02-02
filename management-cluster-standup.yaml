@@ -1,0 +1,16 @@
+---
+- name: management-cluster-standup
+  hosts: localhost
+  vars_files:
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+
+  tasks:
+  - name: ManagementClusterCreate
+    include_role:
+     name: management-cluster-create
+
+  - name: ExportKubeconfig
+    include_role:
+      name:
+        export-management-kubeconfig
+    tags: export-management-kubeconfig

@@ -1,0 +1,38 @@
+---
+# get OS specific vars, urls to download binaries, and location to install
+- name: get-os-vars
+  include_vars: "group_vars/{{ ansible_facts.system|lower }}.yaml"
+
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ BIN_DIR }}"
+    state: directory
+    mode: '0755'
+
+# downloads and untars tanzu cli bundle
+- name: unpack-tanzu-cli-bundle
+  ansible.builtin.unarchive:
+    src: "{{ TANZU_CLI_URL }}"
+    dest: /tmp
+    remote_src: yes
+
+# install cli
+- name: install-tanzu-cli
+  command: "install /tmp/cli/core/v1.4.1/tanzu-core-{{ OS_1 }}_amd64  {{ BIN_DIR }}/tanzu"
+
+# plugin clean
+- name: tanzu-plugin-clean
+  command: "{{ BIN_DIR }}/tanzu plugin clean"
+
+# plugin install
+- name: tanzu-plugin-install
+  command: "{{ BIN_DIR }}/tanzu plugin install --local cli all"
+  args:
+    chdir: /tmp
+
+# list plugins
+- name:
+  command: "{{ BIN_DIR }}/tanzu plugin list"
+  register: list
+- debug: var=list.stdout_lines
+- debug: var=list.stderr_lines

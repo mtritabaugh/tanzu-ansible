@@ -1,0 +1,78 @@
+---
+- name: cluster-standup
+  hosts: localhost
+  vars_files:
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+
+  tasks:
+  - name: ClusterCreate
+    include_role:
+     name: cluster-create
+
+  - name: ExportKubeconfig
+    include_role:
+      name:
+        export-kubeconfig
+    tags: export-kubeconfig
+
+  - name: InstallCertManager
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: cert-manager
+      #PACKAGE_VER: "{{ CERT_MANAGER_PACKAGE_VER }}"
+      PACKAGE_NS: tanzu-package-repo-global
+    tags: package-install-cert-manager
+
+  - name: InstallContour
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: contour
+      #PACKAGE_VER: "{{ CONTOUR_PACKAGE_VER }}"
+      PACKAGE_NS: tanzu-package-repo-global
+    tags: package-install-contour
+
+  - name: InstallArgoCD
+    include_role:
+      name: install-argocd
+
+  - name: InstallFluent-Bit
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: fluent-bit
+      #PACKAGE_VER: "{{ FLUENT_BIT_PACKAGE_VER }}"
+      PACKAGE_NS: "{{ FLUENT_BIT_PACKAGE_NS }}"
+
+  - name: InstallPrometheus
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: prometheus
+      #PACKAGE_VER: "{{ PROMETHEUS_PACKAGE_VER }}"
+      PACKAGE_NS: "{{ PROMETHEUS_PACKAGE_NS }}"
+
+  - name: InstallGrafana
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: grafana
+      #PACKAGE_VER: "{{ GRAFANA_PACKAGE_VER }}"
+      PACKAGE_NS: tanzu-package-repo-global
+
+  #  - name: InstallExternalDNS
+      #include_role:
+      # name: package-install
+      #vars:
+      #PACKAGE: external-dns
+      #PACKAGE_VER: "{{ EXTERNAL_DNS_PACKAGE_VER }}"
+      # PACKAGE_NS: tanzu-package-repo-global
+
+  - name: InstallHarbor
+    include_role:
+      name: package-install
+    vars:
+      PACKAGE: harbor
+      #PACKAGE_VER: "{{ HARBOR_PACKAGE_VER }}"
+      PACKAGE_NS: tanzu-package-repo-global

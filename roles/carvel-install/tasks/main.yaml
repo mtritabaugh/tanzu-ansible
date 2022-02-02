@@ -1,0 +1,24 @@
+---
+# get OS specific vars, urls to download binaries, and location to install
+- name: get-os-vars
+  include_vars: "group_vars/{{ ansible_facts.system|lower }}.yaml"
+
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ BIN_DIR }}"
+    state: directory
+    mode: '0755'
+
+- name: unzip-carvel
+  command: "gunzip --force {{ item }}"
+  args:
+    chdir: /tmp/cli
+  with_fileglob:
+  - "/tmp/cli/*.gz"
+
+- name: install-carvel
+  command: "install {{ item }} {{ BIN_DIR }}/{{ item | basename | split('-') | first }}"
+  args:
+    chdir: /tmp/cli
+  with_fileglob:
+  - "/tmp/cli/*amd64*"

@@ -1,0 +1,5 @@
+---
+- name: cluster-create
+  command: "tanzu cluster create {{ CLUSTER_NAME }} -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  register: out
+- debug: var=out.stdout_lines

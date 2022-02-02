@@ -1,0 +1,26 @@
+---
+# get OS specific vars, urls to download binaries, and location to install
+- name: get-os-vars
+  include_vars: "group_vars/{{ ansible_facts.system|lower }}.yaml"
+
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ BIN_DIR }}"
+    state: directory
+    mode: '0755'
+
+# download kubectl .gz file
+- name: download-kubectl
+  get_url:
+    url: "{{ KUBECTL_CLI_URL }}"
+    dest: /tmp
+  register: out
+- debug: var=out.dest
+
+# uncompress .gz file
+- name: uncompress-kubectl
+  command: "gunzip --force {{ out.dest }}"
+
+# install kubectl. {{ out.dest | splitext | first }} strips the .gz from the file name.
+- name: install-kubectl
+  command: "install {{ out.dest | splitext | first }}  {{ BIN_DIR }}/kubectl"

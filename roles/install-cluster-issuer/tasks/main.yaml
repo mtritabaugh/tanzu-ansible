@@ -1,0 +1,7 @@
+---
+- name: install-cluster-issuer
+  command: "kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cert-manager/tanzu-issuer.yaml"
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: out
+- debug: var=out.stdout_lines

@@ -1,0 +1,28 @@
+---
+- name: create argocd namespace 
+  command: "kubectl create ns argocd"
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: out
+- debug: var=out.stdout_lines
+
+- name: install argocd
+  command: "kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/install-with-argo-cd.yaml"
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: out
+- debug: var=out.stdout_lines
+
+- name: create cert
+  command: "kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/argocd-cert.yaml"
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: out
+- debug: var=out.stdout_lines
+
+- name: create httpproxy
+  command: "kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/argocd-httpproxy.yaml"
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: out
+- debug: var=out.stdout_lines

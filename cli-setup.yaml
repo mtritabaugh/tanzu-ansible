@@ -1,0 +1,20 @@
+---
+- name: Cli-Setup
+  hosts: localhost
+  tasks:
+  - name: TanzuCliInstall
+    include_role:
+     name: tanzu-install
+
+  - name: KubectlInstall
+    include_role:
+     name: kubectl-install
+
+  - name: CarvelInstall
+    include_role:
+     name: carvel-install
+
+  - name: YqInstall
+    include_role:
+     name: yq-install
+

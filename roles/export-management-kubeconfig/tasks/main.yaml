@@ -1,0 +1,6 @@
+---
+- name: export-management-:kubeconfig
+  command: "tanzu management-cluster kubeconfig get --export-file ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config --admin"
+  tags: export-kubeconfig
+  register: out
+- debug: var=out.stdout_lines
