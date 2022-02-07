@@ -11,8 +11,7 @@
 
   - name: ExportKubeconfig
     include_role:
-      name:
-        export-kubeconfig
+      name: export-kubeconfig
     tags: export-kubeconfig
 
   - name: InstallCertManager
@@ -23,6 +22,10 @@
       #PACKAGE_VER: "{{ CERT_MANAGER_PACKAGE_VER }}"
       PACKAGE_NS: tanzu-package-repo-global
     tags: package-install-cert-manager
+
+  - name: InstallClusterIssuer
+    include_role:
+      name: install-cluster-issuer
 
   - name: InstallContour
     include_role:

@@ -3,15 +3,21 @@
 - name: get-os-vars
   include_vars: "group_vars/{{ ansible_facts.system|lower }}.yaml"
 
-- name: Create a directory if it does not exist
-  file:
-    path: "{{ BIN_DIR }}"
-    state: directory
-    mode: '0755'
+#- name: Create a directory if it does not exist
+#  file:
+#    path: "{{ BIN_DIR }}"
+#    state: directory
+#    mode: '0755'
 
 # download yq binary
 - name: download-yq
   get_url:
     url: "{{ YQ_CLI_URL }}"
-    dest: "{{ BIN_DIR }}/yq"
+    #dest: "{{ BIN_DIR }}/yq"
+    dest: "{{ BIN_DIR }}"
     mode: '0755'
+
+# install kubectl. {{ out.dest | splitext | first }} strips the .gz from the file name.
+#- name: install-yq
+#  command: "sudo install /tmp/yq  {{ BIN_DIR }}"
+

@@ -3,4 +3,3 @@ OS_2: linux
 TANZU_CLI_URL: http://ralph:33000/mtritab/cli/raw/branch/master/tanzu-cli-bundle-linux-amd64.tar
 KUBECTL_CLI_URL: http://ralph:33000/mtritab/cli/raw/branch/master/kubectl-linux-v1.21.2+vmware.1.gz
 YQ_CLI_URL: https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64
-BIN_DIR: ~/.local/bin

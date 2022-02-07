@@ -5,7 +5,9 @@
 
 # Check if package is already installed.
 - name: package-installed-check
-  command: "tanzu package installed get {{ PACKAGE }} -n {{ PACKAGE_NS }} -o yaml"
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tanzu package installed get {{ PACKAGE }} -n {{ PACKAGE_NS }} -o yaml
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: is_installed
@@ -14,7 +16,6 @@
 # If package exists, only print details
 - when: "'Reconcile succeeded' in is_installed.stdout"
   block:
-
   - name: package-already-installed
     debug:
       msg: "{{ PACKAGE }} is already installed. {{is_installed.stdout_lines }}"
@@ -25,7 +26,9 @@
   block:
 
   - name: get-package-version
-    shell: "tanzu package available list {{ PACKAGE }}.tanzu.vmware.com -o yaml | yq e '.[0].version' -"
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      tanzu package available list {{ PACKAGE }}.tanzu.vmware.com -o yaml | yq e '.[0].version' -
     environment:
       KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
     register: version
@@ -45,18 +48,24 @@
 
     ### Get the package URL
     - name: get-package-url
-      command: "kubectl -n {{ PACKAGE_NS }} get packages {{ PACKAGE }}.tanzu.vmware.com.{{ PACKAGE_VER }} -o jsonpath='{.spec.template.spec.fetch[0].imgpkgBundle.image}'"
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        kubectl -n {{ PACKAGE_NS }} get packages {{ PACKAGE }}.tanzu.vmware.com.{{ PACKAGE_VER }} -o jsonpath='{.spec.template.spec.fetch[0].imgpkgBundle.image}'
       environment:
         KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
       register: url
     
     ### Pull the image bundle
     - name: get-image-bundle
-      command: "imgpkg pull -b {{ url.stdout }} --registry-verify-certs=false -o /tmp/{{ PACKAGE }}"
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        imgpkg pull -b {{ url.stdout }} --registry-verify-certs=false -o /tmp/{{ PACKAGE }}
 
     ### Remove comments from the data-values file
     - name: remove-comments-from-values
-      shell: "yq -i eval '... comments=\"\"' /tmp/{{ PACKAGE }}/config/values.yaml"
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        yq -i eval '... comments=\"\"' /tmp/{{ PACKAGE }}/config/values.yaml
     
     ### Create package specific directory for data-values file
     - name: create-directory
@@ -93,7 +102,9 @@
   
   ## Install package
   - name: package-install
-    command: "tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }}"
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }}
     environment:
       KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
     register: out

@@ -1,5 +1,9 @@
 ---
 - name: management-cluster-create
-  command: "tanzu management-cluster create {{ CLUSTER_NAME }} -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tanzu management-cluster create {{ CLUSTER_NAME }} -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml
+  args:
+    executable: /bin/bash
   register: out
 - debug: var=out.stdout_lines

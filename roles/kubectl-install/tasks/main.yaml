@@ -24,3 +24,4 @@
 # install kubectl. {{ out.dest | splitext | first }} strips the .gz from the file name.
 - name: install-kubectl
   command: "install {{ out.dest | splitext | first }}  {{ BIN_DIR }}/kubectl"
+  #command: "sudo install {{ out.dest | splitext | first }}  {{ BIN_DIR }}/kubectl"
