@@ -2,8 +2,7 @@
 - name: install-cluster-issuer
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-    kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cert-manager/tanzu-issuer.yaml
+    kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/tanzu-issuer.yaml
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: out
-- debug: var=out.stdout_lines

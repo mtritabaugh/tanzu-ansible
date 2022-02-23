@@ -1,0 +1,25 @@
+---
+- name: tmc-clustergroup-get
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc clustergroup list --name {{ TMC_CLUSTER_GROUP }}
+  args:
+    executable: /bin/bash
+  register: check_group
+
+- when: "'No clustergroups to list' in check_group.stdout"
+  name: tmc-clustergroup-create
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc clustergroup create -n {{ TMC_CLUSTER_GROUP }}
+  args:
+    executable: /bin/bash
+  register: out
+
+- name: tmc-mc-register
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc mc register {{ CLUSTER_NAME }} -c {{ TMC_CLUSTER_GROUP }} -k ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config -p TKG
+  args:
+    executable: /bin/bash
+  register: out

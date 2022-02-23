@@ -15,7 +15,6 @@
     url: "{{ KUBECTL_CLI_URL }}"
     dest: /tmp
   register: out
-- debug: var=out.dest
 
 # uncompress .gz file
 - name: uncompress-kubectl

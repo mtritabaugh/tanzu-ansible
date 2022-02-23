@@ -1,8 +1,6 @@
 ---
-- name: export-kubeconfig
+- name: tanzu-export-kubeconfig
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     tanzu cluster kubeconfig get {{ CLUSTER_NAME }} --export-file ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config --admin
-  tags: export-kubeconfig
   register: out
-- debug: var=out.stdout_lines

@@ -4,7 +4,7 @@
     package={{ PACKAGE }}
 
 # Check if package is already installed.
-- name: package-installed-check
+- name: tanzu-package-installed-check
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     tanzu package installed get {{ PACKAGE }} -n {{ PACKAGE_NS }} -o yaml
@@ -16,7 +16,7 @@
 # If package exists, only print details
 - when: "'Reconcile succeeded' in is_installed.stdout"
   block:
-  - name: package-already-installed
+  - name: tanzu-package-already-installed
     debug:
       msg: "{{ PACKAGE }} is already installed. {{is_installed.stdout_lines }}"
 
@@ -25,7 +25,7 @@
 - when: "'does not exist' in is_installed.stderr"
   block:
 
-  - name: get-package-version
+  - name: tanzu-get-package-version
     shell: |
       export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
       tanzu package available list {{ PACKAGE }}.tanzu.vmware.com -o yaml | yq e '.[0].version' -
@@ -50,7 +50,7 @@
     - name: get-package-url
       shell: |
         export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-        kubectl -n {{ PACKAGE_NS }} get packages {{ PACKAGE }}.tanzu.vmware.com.{{ PACKAGE_VER }} -o jsonpath='{.spec.template.spec.fetch[0].imgpkgBundle.image}'
+        kubectl -n tanzu-package-repo-global get packages {{ PACKAGE }}.tanzu.vmware.com.{{ PACKAGE_VER }} -o jsonpath='{.spec.template.spec.fetch[0].imgpkgBundle.image}'
       environment:
         KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
       register: url
@@ -65,7 +65,7 @@
     - name: remove-comments-from-values
       shell: |
         export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-        yq -i eval '... comments=\"\"' /tmp/{{ PACKAGE }}/config/values.yaml
+        yq -i eval '... comments=""' /tmp/{{ PACKAGE }}/config/values.yaml
     
     ### Create package specific directory for data-values file
     - name: create-directory
@@ -101,14 +101,14 @@
     
   
   ## Install package
-  - name: package-install
+  - name: tanzu-package-install
     shell: |
       export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }}
+      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }} --create-namespace --poll-timeout 10m
     environment:
       KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
     register: out
-  - debug: var=out.stdout_lines
-  - debug: var=out.stderr_lines
+    #- debug: var=out.stdout_lines
+    #- debug: var=out.stderr_lines
   
   

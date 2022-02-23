@@ -1,0 +1,9 @@
+---
+- name: tmc-cluster-integration
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc cluster integration create -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/{{ INTEGRATION }}.json -m attached -p attached
+  args:
+    executable: /bin/bash
+  register: out
+- debug: var=out.stdout_lines

@@ -24,19 +24,16 @@
 # plugin clean
 - name: tanzu-plugin-clean
   command: "{{ BIN_DIR }}/tanzu plugin clean"
-  #command: "tanzu plugin clean"
 
 # plugin install
 - name: tanzu-plugin-install
   command: "{{ BIN_DIR }}/tanzu plugin install --local cli all"
-  #command: "tanzu plugin install --local cli all"
   args:
     chdir: /tmp
 
 # list plugins
 - name:
   command: "{{ BIN_DIR }}/tanzu plugin list"
-  #command: "tanzu plugin list"
   register: list
-- debug: var=list.stdout_lines
-- debug: var=list.stderr_lines
+  #- debug: var=list.stdout_lines
+  #- debug: var=list.stderr_lines

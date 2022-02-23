@@ -1,0 +1,9 @@
+---
+- name: tmc-cluster-delete
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc cluster delete {{ CLUSTER_NAME }} -f -m {{ TMC_MANAGEMENT_CLUSTER_NAME }} -p attached
+  args:
+    executable: /bin/bash
+  register: out
+  #- debug: var=out.stdout_lines

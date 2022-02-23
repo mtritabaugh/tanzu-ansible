@@ -1,0 +1,7 @@
+---
+- name: tanzu-cluster-delete
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tanzu cluster delete {{ CLUSTER_NAME }} -y
+  register: out
+- debug: var=out.stdout_lines

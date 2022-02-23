@@ -1,16 +1,36 @@
 ---
-- name: management-cluster-standup
+- name: Management-Cluster-Standup
   hosts: localhost
+  connection: local
   vars_files:
   -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/ansible-config.yaml"
 
   tasks:
-  - name: ManagementClusterCreate
+  - name: management-cluster-create
     include_role:
-     name: management-cluster-create
+      name: management-cluster-create
+      apply:
+        tags: 
+        - management-cluster-create
+    tags: 
+    - management-cluster-create
 
-  - name: ExportKubeconfig
+  - name: export-management-kubeconfig
     include_role:
-      name:
-        export-management-kubeconfig
-    tags: export-management-kubeconfig
+      name: export-management-kubeconfig
+      apply:
+        tags: 
+        - export-management-kubeconfig
+    tags: 
+    - export-management-kubeconfig
+
+  - name: tmc-mc-register
+    include_role:
+      name: tmc-mc-register
+      apply:
+        tags: 
+        - tmc-mc-register
+    tags: 
+    - tmc-mc-register
+    

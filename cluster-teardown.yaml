@@ -1,0 +1,26 @@
+---
+- name: cluster-teardown
+  hosts: localhost
+  vars_files:
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/ansible-config.yaml"
+
+  tasks:
+  - name: tmc-cluster-create
+    include_role:
+      name: tmc-cluster-delete
+      apply:
+        tags:
+        - tmc-cluster-create
+    tags:
+    - tmc-cluster-delete
+
+  - name: cluster-delete
+    include_role:
+     name: cluster-delete
+     apply:
+       tags:
+       - cluster-delete
+    tags:
+    - cluster-delete
+

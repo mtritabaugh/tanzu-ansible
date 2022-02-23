@@ -2,19 +2,39 @@
 - name: Cli-Setup
   hosts: localhost
   tasks:
-  - name: TanzuCliInstall
+  - name: tanzu-cli-install
     include_role:
-     name: tanzu-install
+      name: tanzu-cli-install
+      apply:
+        tags:
+        - tanzu-cli-install
+    tags:
+    - tanzu-cli-install
 
-  - name: KubectlInstall
+  - name: kubectl-install
     include_role:
-     name: kubectl-install
+      name: kubectl-install
+      apply:
+        tags:
+        - kubectl-install
+    tags:
+    - kubectl-install
 
-  - name: CarvelInstall
+  - name: carvel-install
     include_role:
-     name: carvel-install
+      name: carvel-install
+      apply:
+        tags:
+        - carvel-install
+    tags:
+    - carvel-install
 
-  - name: YqInstall
+  - name: yq-install
     include_role:
-     name: yq-install
+      name: yq-install
+      apply:
+        tags:
+        - yq-install
+    tags:
+    - yq-install
 

@@ -18,7 +18,6 @@
 
 - name: install-carvel
   command: "install {{ item }} {{ BIN_DIR }}/{{ item.split('-')[0] | basename }}"
-  #command: "install {{ item }} {{ BIN_DIR }}/{{ item | basename | split('-') | first }}"
   args:
     chdir: /tmp/cli
   with_fileglob:

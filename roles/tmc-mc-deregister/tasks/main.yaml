@@ -1,0 +1,9 @@
+---
+- name: tmc-mc-deregister
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc mc deregister {{ CLUSTER_NAME }} -k ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config
+  args:
+    executable: /bin/bash
+  register: out
+- debug: var=out.stderr_lines

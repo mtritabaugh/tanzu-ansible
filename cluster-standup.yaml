@@ -1,68 +1,94 @@
 ---
-- name: cluster-standup
+- name: Cluster-Standup
   hosts: localhost
+  connection: local
   vars_files:
   -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/ansible-config.yaml"
 
   tasks:
-  - name: ClusterCreate
+  - name: cluster-create
     include_role:
-     name: cluster-create
+      name: cluster-create
+      apply:
+        tags: 
+        - cluster-create
+    tags: 
+    - cluster-create
 
-  - name: ExportKubeconfig
+  - name: export-kubeconfig
     include_role:
       name: export-kubeconfig
-    tags: export-kubeconfig
+      apply:
+        tags: 
+        - export-kubeconfig
+    tags: 
+    - export-kubeconfig
 
-  - name: InstallCertManager
+  - name: package-install-cert-manager
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-cert-manager
     vars:
       PACKAGE: cert-manager
       #PACKAGE_VER: "{{ CERT_MANAGER_PACKAGE_VER }}"
-      PACKAGE_NS: tanzu-package-repo-global
-    tags: package-install-cert-manager
+      PACKAGE_NS: "{{ CERT_MANAGER_PACKAGE_NS }}"
+    tags:
+    - package-install-cert-manager
 
-  - name: InstallClusterIssuer
-    include_role:
-      name: install-cluster-issuer
-
-  - name: InstallContour
+  - name: package-install-contour
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-contour
     vars:
       PACKAGE: contour
       #PACKAGE_VER: "{{ CONTOUR_PACKAGE_VER }}"
-      PACKAGE_NS: tanzu-package-repo-global
-    tags: package-install-contour
+      PACKAGE_NS: "{{ CONTOUR_PACKAGE_NS }}"
+    tags:
+    - package-install-contour
 
-  - name: InstallArgoCD
-    include_role:
-      name: install-argocd
-
-  - name: InstallFluent-Bit
+  - name: package-install-fluent-bit
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-fluent-bit
     vars:
       PACKAGE: fluent-bit
       #PACKAGE_VER: "{{ FLUENT_BIT_PACKAGE_VER }}"
       PACKAGE_NS: "{{ FLUENT_BIT_PACKAGE_NS }}"
+    tags: 
+    - package-install-fluent-bit
 
-  - name: InstallPrometheus
+  - name: package-install-prometheus
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-prometheus
     vars:
       PACKAGE: prometheus
       #PACKAGE_VER: "{{ PROMETHEUS_PACKAGE_VER }}"
       PACKAGE_NS: "{{ PROMETHEUS_PACKAGE_NS }}"
+    tags: 
+    - package-install-prometheus
 
-  - name: InstallGrafana
+  - name: package-install-grafana
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-grafana
     vars:
       PACKAGE: grafana
       #PACKAGE_VER: "{{ GRAFANA_PACKAGE_VER }}"
-      PACKAGE_NS: tanzu-package-repo-global
+      PACKAGE_NS: "{{ GRAFANA_PACKAGE_NS }}"
+    tags:
+    - package-install-grafana
 
   #  - name: InstallExternalDNS
       #include_role:
@@ -72,10 +98,62 @@
       #PACKAGE_VER: "{{ EXTERNAL_DNS_PACKAGE_VER }}"
       # PACKAGE_NS: tanzu-package-repo-global
 
-  - name: InstallHarbor
+  - name: package-install-harbor
     include_role:
       name: package-install
+      apply:
+        tags: 
+        - package-install-harbor
     vars:
       PACKAGE: harbor
       #PACKAGE_VER: "{{ HARBOR_PACKAGE_VER }}"
-      PACKAGE_NS: tanzu-package-repo-global
+      PACKAGE_NS: "{{ HARBOR_PACKAGE_NS }}"
+    tags:
+    - package-install-harbor
+
+  - name: install-cluster-issuer
+    include_role:
+      name: install-cluster-issuer
+      apply:
+        tags: 
+        - install-cluster-issuer
+    tags:
+    - install-cluster-issuer
+
+  - name: install-argocd
+    include_role:
+      name: install-argocd
+      apply:
+        tags: 
+        - install-argocd
+    tags:
+    - install-argocd
+
+  - name: tmc-cluster-attach
+    include_role:
+      name: tmc-cluster-attach
+      apply:
+        tags: 
+        - tmc-cluster-attach
+    tags:
+    - tmc-cluster-attach
+
+  - name: tmc-cluster-integration-to
+    include_role:
+      name: tmc-cluster-integration
+      apply:
+        tags: 
+        - tmc-cluster-integration-to
+    vars:
+      INTEGRATION: to
+    tags: tmc-cluster-integration-to
+
+  - name: tmc-cluster-integration-tsm
+    include_role:
+      name: tmc-cluster-integration
+      apply:
+        tags: 
+        - tmc-cluster-integration-tsm
+    vars:
+      INTEGRATION: tsm
+    tags: tmc-cluster-integration-tsm

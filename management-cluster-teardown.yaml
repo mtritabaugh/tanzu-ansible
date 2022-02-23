@@ -1,0 +1,25 @@
+---
+- name: Management-Cluster-Teardown
+  hosts: localhost
+  vars_files:
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
+  -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/ansible-config.yaml"
+
+  tasks:
+  - name: tmc-mc-deregister
+    include_role:
+      name: tmc-mc-deregister
+      apply:
+        tags:
+        - tmc-mc-deregister
+    tags: 
+    - tmc-mc-deregister
+
+  - name: management-cluster-delete
+    include_role:
+      name: management-cluster-delete
+      apply:
+        tags:
+        - management-cluster-delete 
+    tags:
+    - management-cluster-delete

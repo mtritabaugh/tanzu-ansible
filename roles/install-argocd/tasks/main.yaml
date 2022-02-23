@@ -1,36 +1,32 @@
 ---
-- name: create argocd namespace 
+- name: create-argocd-namespace 
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     kubectl create ns argocd
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: out
-- debug: var=out.stdout_lines
 
-- name: install argocd
+- name: install-argocd
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/install-with-argo-cd.yaml
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: out
-- debug: var=out.stdout_lines
 
-- name: create cert
+- name: create-cert
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/argocd-cert.yaml
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: out
-- debug: var=out.stdout_lines
 
-- name: create httpproxy
+- name: create-httpproxy
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
     kubectl apply -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/argocd/argocd-httpproxy.yaml
   environment:
     KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
   register: out
-- debug: var=out.stdout_lines
