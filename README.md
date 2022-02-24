@@ -18,7 +18,10 @@ the Tanzu docs.
 ## Install
 
     mkdir -p ~/.config/tanzu
-    git clone --depth=1 gitea@ralph.simpson:mtritab/tanzu-ansible.git ~/.config/tanzu/ansible
+    git clone --depth=1 git@github.com:mtritabaugh/tanzu-ansible.git ~/.config/tanzu/ansible
+
+    mkdir -p ~/.config/tanzu/clusters
+    git clone --depth=1 git@github.com:mtritabaugh/tanzu-clusters.git ~/.config/tanzu/clusters
 
 
 ## Binaries Setup
