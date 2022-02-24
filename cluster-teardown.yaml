@@ -6,12 +6,12 @@
   -  "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/ansible-config.yaml"
 
   tasks:
-  - name: tmc-cluster-create
+  - name: tmc-cluster-delete
     include_role:
       name: tmc-cluster-delete
       apply:
         tags:
-        - tmc-cluster-create
+        - tmc-cluster-delete
     tags:
     - tmc-cluster-delete
 
