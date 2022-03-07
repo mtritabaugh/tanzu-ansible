@@ -82,16 +82,16 @@
 
     ### If Harbor
     - when: package == "harbor"
-      name: check if harbor
       block:
+
         #### Generate harbor passwords
         - name: generate-harbor-passwords
           command: "/tmp/{{ PACKAGE }}/config/scripts/generate-passwords.sh {{ DATA_VALUES_FILE }}"
 
     ### If grafana
     - when: package == "grafana"
-      name: check if grafana
       block:
+
         #### Change grafana namespace
         - name: change-grafana-namespace
           ansible.builtin.replace:
@@ -99,12 +99,32 @@
             regexp: 'tanzu-system-monitoring'
             replace: 'tanzu-system-dashboards'
     
+  ## Check for package namespace
+  - name: package-ns-check
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl get ns {{ PACKAGE_NS }} --ignore-not-found
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: check_ns
+    #- debug: var=check_ns.stdout_lines
+    #- debug: var=check_ns.stderr_lines
+
+  ## Create namespace if not found
+  - when: check_ns.stdout | length == 0
+    name: package-ns-create
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl create ns {{ PACKAGE_NS }}
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
   
   ## Install package
   - name: tanzu-package-install
     shell: |
       export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }} --create-namespace --poll-timeout 10m
+      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }} --poll-timeout 10m
     environment:
       KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
     register: out
