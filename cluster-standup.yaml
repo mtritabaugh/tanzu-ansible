@@ -129,14 +129,14 @@
     tags:
     - install-argocd
 
-  - name: tmc-cluster-attach
+  - name: tmc-cluster-manage
     include_role:
-      name: tmc-cluster-attach
+      name: tmc-cluster-manage
       apply:
         tags:
-        - tmc-cluster-attach
+        - tmc-cluster-manage
     tags:
-    - tmc-cluster-attach
+    - tmc-cluster-manage
 
   - name: tmc-cluster-integration-to
     include_role:
