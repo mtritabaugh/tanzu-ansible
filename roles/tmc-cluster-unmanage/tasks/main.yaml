@@ -1,0 +1,9 @@
+---
+- name: tmc-cluster-unmanage
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc managementcluster -m {{ MGMT_CLUSTER_NAME }} provisioner -p {{ TMC_PROVISIONER }} tanzukubernetescluster unmanage {{ CLUSTER_NAME }}
+  args:
+    executable: /bin/bash
+  register: out
+  #- debug: var=out.stdout_lines

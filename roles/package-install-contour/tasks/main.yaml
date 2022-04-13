@@ -1,0 +1,144 @@
+---
+# set package variable
+- set_fact:
+    package={{ PACKAGE }}
+
+# Check if package is already installed.
+- name: tanzu-package-installed-check
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tanzu package installed get {{ PACKAGE }} -n {{ PACKAGE_NS }} -o yaml
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+  register: is_installed
+
+
+# If package exists, only print details
+- when: "'Reconcile succeeded' in is_installed.stdout"
+  block:
+  - name: tanzu-package-already-installed
+    debug:
+      msg: "{{ PACKAGE }} is already installed. {{is_installed.stdout_lines }}"
+
+     
+# If package doesn't exist, install it.
+- when: "'does not exist' in is_installed.stderr"
+  block:
+
+  - name: tanzu-get-package-version
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      tanzu package available list {{ PACKAGE }}.tanzu.vmware.com -o yaml | yq e '.[0].version' -
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: version
+
+  - set_fact:
+      PACKAGE_VER={{ version.stdout }}
+
+  ## check if data-values file already exists
+  - name: data-values-check
+    stat:
+      path: "{{ DATA_VALUES_FILE }}"
+    register: data_values
+  
+  ## If data-values file doesn't exist, pull it
+  - when: not data_values.stat.exists
+    block:
+
+    ### Get the package URL
+    - name: get-package-url
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        kubectl -n tanzu-package-repo-global get packages {{ PACKAGE }}.tanzu.vmware.com.{{ PACKAGE_VER }} -o jsonpath='{.spec.template.spec.fetch[0].imgpkgBundle.image}'
+      environment:
+        KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+      register: url
+    
+    ### Pull the image bundle
+    - name: get-image-bundle
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        imgpkg pull -b {{ url.stdout }} --registry-verify-certs=false -o /tmp/{{ PACKAGE }}
+
+    ### Remove comments from the data-values file
+    - name: remove-comments-from-values
+      shell: |
+        export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+        yq -i eval '... comments=""' /tmp/{{ PACKAGE }}/config/values.yaml
+    
+    ### Create package specific directory for data-values file
+    - name: create-directory
+      ansible.builtin.file:
+        path: "{{ DATA_VALUES_DIR }}"
+        state: directory
+        mode: '0755'
+    
+    ### Copy and rename data-values file 
+    - name: copy-values 
+      copy:
+        src: "/tmp/{{ PACKAGE }}/config/values.yaml"
+        dest: "{{ DATA_VALUES_FILE }}"
+
+  ## Check for package namespace
+  - name: package-ns-check
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl get ns {{ PACKAGE_NS }} --ignore-not-found
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: check_ns
+    #- debug: var=check_ns.stdout_lines
+    #- debug: var=check_ns.stderr_lines
+
+  ## Create namespace if not found
+  - when: check_ns.stdout | length == 0
+    name: package-ns-create
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl create ns {{ PACKAGE_NS }}
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
+  
+  ## Create static-ip-overlay secret
+  - name: create-contour-static-ip-overlay
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl create secret generic contour-static-ip-overlay -n {{ PACKAGE_NS }} -o yaml --dry-run=client --from-file=/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/{{ PACKAGE }}/contour-static-ip-overlay.yaml | kubectl apply -f-
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
+
+  ## Install package
+  - name: tanzu-package-install
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      tanzu package install {{ PACKAGE }} --package-name {{ PACKAGE }}.tanzu.vmware.com --version {{ PACKAGE_VER }} -f {{ DATA_VALUES_FILE }} -n {{ PACKAGE_NS }} --wait=false
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
+    #- debug: var=out.stdout_lines
+    #- debug: var=out.stderr_lines
+  
+  ## Add annotation for static-ip-overlay secret 
+  - name: create-contour-static-ip-overlay
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl annotate pkgi {{ PACKAGE }} ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=contour-static-ip-overlay -n tanzu-user-managed
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
+  
+  ## Delete envoy to get updated IP 
+  - name: delete-envoy-svc
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl delete svc envoy -n tanzu-system-ingress
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ CLUSTER_NAME }}/config"
+    register: out
+    until: out.stdout.find('service "envoy" deleted') != -1
+    retries: 5
+    delay: 10
+  

@@ -1,0 +1,26 @@
+---
+- name: tmc-check-group
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc clustergroup get {{ TMC_CLUSTER_GROUP }}
+  args:
+    executable: /bin/bash
+  register: check_group
+
+- when: "'Resource not found' in check_group.stderr"
+  name: tmc-create-group
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc clustergroup create -n {{ TMC_CLUSTER_GROUP }}
+  args:
+    executable: /bin/bash
+  register: out
+
+- name: tmc-cluster-manage
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    tmc managementcluster -m {{ MGMT_CLUSTER_NAME }} provisioner -p {{ TMC_PROVISIONER }} tanzukubernetescluster manage --cluster-group {{ TMC_CLUSTER_GROUP }} {{ CLUSTER_NAME }}
+  args:
+    executable: /bin/bash
+  register: out
+  #- debug: var=out.stdout_lines

@@ -2,6 +2,6 @@
 - name: tanzu-cluster-create
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
-    tanzu cluster create {{ CLUSTER_NAME }} -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml
+    eval "$(cat ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/supersecretpass.txt | xargs -0) tanzu cluster create {{ CLUSTER_NAME }} -f ~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/cluster-config.yaml"
   register: out
 - debug: var=out.stdout_lines

@@ -11,25 +11,25 @@
     include_role:
       name: cluster-create
       apply:
-        tags: 
+        tags:
         - cluster-create
-    tags: 
+    tags:
     - cluster-create
 
   - name: export-kubeconfig
     include_role:
       name: export-kubeconfig
       apply:
-        tags: 
+        tags:
         - export-kubeconfig
-    tags: 
+    tags:
     - export-kubeconfig
 
   - name: package-install-cert-manager
     include_role:
       name: package-install
       apply:
-        tags: 
+        tags:
         - package-install-cert-manager
     vars:
       PACKAGE: cert-manager
@@ -40,9 +40,9 @@
 
   - name: package-install-contour
     include_role:
-      name: package-install
+      name: package-install-contour
       apply:
-        tags: 
+        tags:
         - package-install-contour
     vars:
       PACKAGE: contour
@@ -55,33 +55,33 @@
     include_role:
       name: package-install
       apply:
-        tags: 
+        tags:
         - package-install-fluent-bit
     vars:
       PACKAGE: fluent-bit
       #PACKAGE_VER: "{{ FLUENT_BIT_PACKAGE_VER }}"
       PACKAGE_NS: "{{ FLUENT_BIT_PACKAGE_NS }}"
-    tags: 
+    tags:
     - package-install-fluent-bit
 
   - name: package-install-prometheus
     include_role:
       name: package-install
       apply:
-        tags: 
+        tags:
         - package-install-prometheus
     vars:
       PACKAGE: prometheus
       #PACKAGE_VER: "{{ PROMETHEUS_PACKAGE_VER }}"
       PACKAGE_NS: "{{ PROMETHEUS_PACKAGE_NS }}"
-    tags: 
+    tags:
     - package-install-prometheus
 
   - name: package-install-grafana
     include_role:
       name: package-install
       apply:
-        tags: 
+        tags:
         - package-install-grafana
     vars:
       PACKAGE: grafana
@@ -102,7 +102,7 @@
     include_role:
       name: package-install
       apply:
-        tags: 
+        tags:
         - package-install-harbor
     vars:
       PACKAGE: harbor
@@ -115,7 +115,7 @@
     include_role:
       name: install-cluster-issuer
       apply:
-        tags: 
+        tags:
         - install-cluster-issuer
     tags:
     - install-cluster-issuer
@@ -124,7 +124,7 @@
     include_role:
       name: install-argocd
       apply:
-        tags: 
+        tags:
         - install-argocd
     tags:
     - install-argocd
@@ -133,7 +133,7 @@
     include_role:
       name: tmc-cluster-attach
       apply:
-        tags: 
+        tags:
         - tmc-cluster-attach
     tags:
     - tmc-cluster-attach
@@ -142,7 +142,7 @@
     include_role:
       name: tmc-cluster-integration
       apply:
-        tags: 
+        tags:
         - tmc-cluster-integration-to
     vars:
       INTEGRATION: to
@@ -152,7 +152,7 @@
     include_role:
       name: tmc-cluster-integration
       apply:
-        tags: 
+        tags:
         - tmc-cluster-integration-tsm
     vars:
       INTEGRATION: tsm

@@ -1,0 +1,3 @@
+---
+DATA_VALUES_DIR: "~/.config/tanzu/clusters/{{ CLUSTER_NAME }}/{{ PACKAGE }}"
+DATA_VALUES_FILE: "{{ DATA_VALUES_DIR }}/{{ PACKAGE }}-data-values.yaml"
