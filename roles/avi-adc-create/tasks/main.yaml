@@ -1,0 +1,8 @@
+---
+- name: avi-adc-create
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    kubectl apply ~/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/install-ako-for-{{ CLUSTER_NAME }}.yaml
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/config"
+  register: out

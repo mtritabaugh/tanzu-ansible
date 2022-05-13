@@ -1,0 +1,22 @@
+---
+- name: avi-check
+  set_fact:
+    avi_group={{ AVI_GROUP }}
+
+- when: ( avi_group is defined ) and ( avi_group | length > 0 )
+  block:
+  - name: avi-adc-create
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl apply -f ~/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/install-ako-for-{{ CLUSTER_NAME }}.yaml
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/config"
+    register: out
+
+  - name: avi-label-apply
+    shell: |
+      export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+      kubectl label cluster {{ CLUSTER_NAME }} avi-group={{ AVI_GROUP }} -n default
+    environment:
+      KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/config"
+    register: out

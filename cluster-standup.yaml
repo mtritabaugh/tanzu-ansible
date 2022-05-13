@@ -16,6 +16,15 @@
     tags:
     - cluster-create
 
+  - name: avi-adc
+    include_role:
+      name: avi-adc
+      apply:
+        tags:
+        - avi-adc
+    tags:
+    - avi-adc
+
   - name: export-kubeconfig
     include_role:
       name: export-kubeconfig

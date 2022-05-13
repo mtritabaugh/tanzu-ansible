@@ -1,0 +1,8 @@
+---
+- name: avi-label-apply
+  shell: |
+    export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
+    kubectl label cluster {{ CLUSTER_NAME }} avi-group={{ AVI_GROUP }}
+  environment:
+    KUBECONFIG: "/home/{{ USER }}/.config/tanzu/clusters/{{ MGMT_CLUSTER_NAME }}/config"
+  register: out

@@ -1,4 +1,4 @@
----
+--
 - name: tmc-clustergroup-get
   shell: |
     export PATH={{ ansible_env.PATH }}:{{ BIN_DIR }}
