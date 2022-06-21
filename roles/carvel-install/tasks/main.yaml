@@ -21,4 +21,4 @@
   args:
     chdir: /tmp/cli
   with_fileglob:
-  - "/tmp/cli/*amd64*"
+          - "/tmp/cli/*amd64*vmware*"

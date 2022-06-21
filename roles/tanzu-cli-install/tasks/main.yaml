@@ -18,16 +18,20 @@
 
 # install cli
 - name: install-tanzu-cli
-  command: "install /tmp/cli/core/v1.4.1/tanzu-core-{{ OS_1 }}_amd64  {{ BIN_DIR }}/tanzu"
+  command: "install /tmp/cli/core/{{ TANZU_CLI_VER }}/tanzu-core-{{ OS_1 }}_amd64  {{ BIN_DIR }}/tanzu"
   #command: "sudo install /tmp/cli/core/v1.4.1/tanzu-core-{{ OS_1 }}_amd64  {{ BIN_DIR }}/tanzu"
+
+# tanzu inint
+- name: tanzu-plugin-init
+  command: "{{ BIN_DIR }}/tanzu init"
 
 # plugin clean
 - name: tanzu-plugin-clean
   command: "{{ BIN_DIR }}/tanzu plugin clean"
 
-# plugin install
+# plugin sync
 - name: tanzu-plugin-install
-  command: "{{ BIN_DIR }}/tanzu plugin install --local cli all"
+  command: "{{ BIN_DIR }}/tanzu plugin sync"
   args:
     chdir: /tmp
 
